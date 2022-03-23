@@ -1,5 +1,5 @@
 test_that("append_values() throws an error when values_to_append are not in prime_key", {
-  expect_error(append_values(6, "Nematode", c(Fish = 2, Mammal = 3, Bird = 5, Arthropod = 7)), "Argument values_to_append contains values not present in argument prime_key. Generate a new key using make_encoding_key() or add the values to the exisiting key using add_values_to_key().")
+  expect_error(append_values(6, "Nematode", c(Fish = 2, Mammal = 3, Bird = 5, Arthropod = 7)), "Argument values_to_append contains values not present in argument prime_key. Generate a new key using function make_encoding_key or add the values to the exisiting key using function add_values_to_key.")
 })
 
 test_that("append_values() returns correct values", {

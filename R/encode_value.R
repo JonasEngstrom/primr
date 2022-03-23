@@ -16,9 +16,22 @@
 #' @seealso [primr::decode_value()]
 #' @md
 #'
+#' @import assertthat
+#'
 #' @examples
 #' # Generate a product equal to 15.
 #' encoded_value <- encode_value(c('Mammal', 'Bird'), c(Fish = 2, Mammal = 3, Bird = 5))
 encode_value <- function(values_to_encode, prime_key) {
+  # Check whether prime_key is named vector.
+  assertthat::assert_that(!is.null(names(prime_key)),
+                        msg = "Argument prime_key incorrectly formated. Please use function make_encoding_key to generate a correctly formatted key.")
+
+  # Check whether values_to_encode contains value not in prime_key.
+  assertthat::assert_that(sum(names(prime_key) %in% values_to_encode) == length(values_to_encode),
+                          msg = "Argument values_to_encode contains values not present in argument prime_key. Generate a new key using function make_encoding_key or add the value to the exisiting key using function add_values_to_key.")
+
+  # Find and multiply primes in key corresponding to values to encode.
+  encoded_value <- prod(prime_key[names(prime_key) %in% values_to_encode])
+
   return(encoded_value)
 }
