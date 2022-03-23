@@ -1,0 +1,15 @@
+Package: primr
+Type: Package
+Title: Encodes Categorical Data Using Prime Number Products
+Version: 0.1.0
+Author: Jonas Engström
+Maintainer: Jonas Engström <JonasEngstrom@users.noreply.github.com>
+Description: PrimR enables storage of an arbitrary number of
+    categorical responses in a single variable in a data frame,
+    by using prime number products.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
