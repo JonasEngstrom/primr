@@ -21,5 +21,14 @@
 #' # Return a key of three prime numbers for three categories.
 #' prime_key <- make_encoding_key(c("Mammal", "Bird", "Fish"))
 make_encoding_key <- function(values_to_encode) {
+  # Remove duplicate values.
+  unique_values <- unique(values_to_encode)
+
+  # Generate prime numbers for encoding.
+  prime_key <- primr::generate_primes(length(unique_values))
+
+  # Assign names to the prime numbers.
+  names(prime_key) <- unique_values
+
   return(prime_key)
 }
