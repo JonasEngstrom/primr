@@ -15,9 +15,25 @@
 #' @seealso [primr::make_encoding_key()]
 #' @md
 #'
+#' @import assertthat
+#'
 #' @examples
 #' # Add "Arthropod" to the previously encoded value.
 #' new_encoded_value <- append_values(6, "Arthropod", c(Fish = 2, Mammal = 3, Bird = 5, Arthropod = 7))
 append_values <- function(encoded_value, values_to_append, prime_key) {
+  decoded_values <- primr::decode_value(encoded_value, prime_key)
+
+  assertthat::assert_that(sum(!values_to_append %in% names(prime_key)) == 0,
+                          msg = "Argument values_to_append contains values not present in argument prime_key. Generate a new key using function make_encoding_key or add the values to the exisiting key using function add_values_to_key.")
+
+  if (sum(!values_to_append %in% decoded_values) == 0) {
+    warning("Argument encoded_value already contains argument values_to_append. No change made.")
+    return(encoded_value)
+  }
+
+  unique_values_to_append <- values_to_append[!values_to_append %in% decoded_values]
+
+  new_encoded_value <- prod(prime_key[names(prime_key) %in% unique_values_to_append]) * encoded_value
+
   return(new_encoded_value)
 }

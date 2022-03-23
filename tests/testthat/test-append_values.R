@@ -8,9 +8,9 @@ test_that("append_values() returns correct values", {
 })
 
 test_that("append_values() returns a warning if values_to_append are already in encoded_value", {
-  expect_warning(expect_equal(append_values(6, "Fish", c(Fish = 2, Mammal = 3, Bird = 5, Arthropod = 7)), 6 * 5), "Argument encoded_value already contains argument values_to_append. No change made.")
+  expect_warning(append_values(6, "Fish", c(Fish = 2, Mammal = 3, Bird = 5, Arthropod = 7)), "Argument encoded_value already contains argument values_to_append. No change made.")
 })
 
 test_that("append_values() returns encoded_value unchanged if values_to_append are already in encoded_value", {
-  expect_equal(expect_equal(append_values(6, "Fish", c(Fish = 2, Mammal = 3, Bird = 5, Arthropod = 7))), 6)
+  expect_warning(expect_equal(append_values(6, "Fish", c(Fish = 2, Mammal = 3, Bird = 5, Arthropod = 7)), 6))
 })
