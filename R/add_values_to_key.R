@@ -12,9 +12,30 @@
 #' @seealso [primr::make_encoding_key()]
 #' @md
 #'
+#' @import assertthat
+#'
 #' @examples
 #' # Add "Arthropod" to encoding key.
 #' new_prime_key <- add_values_to_key("Arthropod", c(Fish = 2, Mammal = 3, Bird = 5))
 add_values_to_key <- function(values_to_add, prime_key) {
+
+  # Check whethee any new values are in values_to_add, compared to prime_key.
+  if (sum(!values_to_add %in% names(prime_key)) == 0) {
+    warning("All values in argument values_to_add already exist in argument prime_key. No new values were added.")
+    return(prime_key)
+  }
+
+  # Generate a new list of primes.
+  old_and_new_primes <- primr::generate_primes(length(c(names(prime_key), unique(values_to_add)[!unique(values_to_add) %in% names(prime_key)])))
+
+  # Remove existing primes.
+  new_primes <- old_and_new_primes[!(old_and_new_primes %in% prime_key)]
+
+  # Assign names to new primes.
+  names(new_primes) <- unique(values_to_add)[!unique(values_to_add) %in% names(prime_key)]
+
+  # Merge old and new encoding keys.
+  new_prime_key <- c(prime_key, new_primes)
+
   return(new_prime_key)
 }
