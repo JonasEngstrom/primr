@@ -15,10 +15,18 @@
 #' @seealso [primr::make_encoding_key()]
 #' @md
 #'
+#' @import assertthat
+#'
 #' @examples
 #' # Return a vector containing "Mammal" and "Bird".
 #' decoded_values <- encode_value(15, c(Fish = 2, Mammal = 3, Bird = 5))
 decode_value <- function(values_to_decode, prime_key) {
+  # Check whether values_to_decode is empty, i.e. equal to 1.
+  if (values_to_decode == 1) {
+    warning("Argument values_to_decode equal to 1, i.e. value is empty. NA returned.")
+    return(NA)
+  }
+
   # Check whether values_to_decode is numeric.
   assertthat::assert_that(is.numeric(values_to_decode),
                         msg = "Argument value_to_decode needs to be a numeric.")

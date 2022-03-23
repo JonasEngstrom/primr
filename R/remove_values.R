@@ -14,9 +14,29 @@
 #' @seealso [primr::make_encoding_key()]
 #' @md
 #'
+#' @import assertthat
+#'
 #' @examples
 #' # Remove "Fish" from encoded value.
 #' new_encoded_value <- remove_values(6, "Fish", c(Fish = 2, Mammal = 3, Bird = 5, Arthropod = 7))
 remove_values <- function(encoded_value, values_to_remove, prime_key) {
+  # Check whether values_to_remove exist in prime_key.
+  assertthat::assert_that(sum(!values_to_remove %in% names(prime_key)) == 0,
+                          msg = "Argument values_to_remove contains values not present in argument prime_key.Please ensure that the right key has been loaded.")
+
+  # Check whether encoded_value contains any of the values in values_to_remove.
+  if(sum(values_to_remove %in% decode_value(encoded_value, prime_key)) == 0) {
+    warning("No values in argument values_to_remove present in argument encoded_value. No change made.")
+    return(encoded_value)
+  }
+
+  # Check whether encoded_value contains at least some of the values in values_to_remove.
+  if(sum(values_to_remove %in% decode_value(encoded_value, prime_key)) < length(values_to_remove)) {
+    warning("Some values in argument values_to_remove not present in argument encoded_value.")
+  }
+
+  # Remove values_to_remove from encoded_value.
+  new_encoded_value <- encoded_value / prod(prime_key[names(prime_key) %in% unique(values_to_remove)[values_to_remove %in% decode_value(encoded_value, prime_key)]])
+
   return(new_encoded_value)
 }
