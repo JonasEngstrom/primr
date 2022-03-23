@@ -1,3 +1,7 @@
+test_that("decode_value() returns correct values", {
+  expect_equal(decode_value(10, c(Fish = 2, Mammal = 3, Bird = 5)), c("Fish", "Bird"))
+})
+
 test_that("decode_value() throws an error if value to decode cannot be factorized to numbers in the encoding key", {
   expect_error(decode_value(248, c(Fish = 2, Mammal = 3, Bird = 5)), "Argument value_to_encode cannot be factorized using values in argument prime_key. Please ensure that correct key is used.")
 })
