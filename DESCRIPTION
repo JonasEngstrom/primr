@@ -13,8 +13,6 @@ Description: PrimR enables storage of an arbitrary number of
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports:
-    assertthat
 Suggests: 
     dplyr,
     rmarkdown,

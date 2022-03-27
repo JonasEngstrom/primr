@@ -14,15 +14,14 @@
 #' @seealso [primr::make_encoding_key()]
 #' @md
 #'
-#' @import assertthat
-#'
 #' @examples
 #' # Remove "Fish" from encoded value.
 #' new_encoded_value <- remove_values(6, "Fish", c(Fish = 2, Mammal = 3, Bird = 5, Arthropod = 7))
 remove_values <- function(encoded_value, values_to_remove, prime_key) {
   # Check whether values_to_remove exist in prime_key.
-  assertthat::assert_that(sum(!values_to_remove %in% names(prime_key)) == 0,
-                          msg = "Argument values_to_remove contains values not present in argument prime_key.Please ensure that the right key has been loaded.")
+  if (!(sum(!values_to_remove %in% names(prime_key)) == 0)) {
+    stop("Argument values_to_remove contains values not present in argument prime_key.Please ensure that the right key has been loaded.")
+  }
 
   # Check whether encoded_value contains any of the values in values_to_remove.
   if(sum(values_to_remove %in% decode_value(encoded_value, prime_key)) == 0) {

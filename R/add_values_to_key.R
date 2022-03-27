@@ -12,8 +12,6 @@
 #' @seealso [primr::make_encoding_key()]
 #' @md
 #'
-#' @import assertthat
-#'
 #' @examples
 #' # Add "Arthropod" to encoding key.
 #' new_prime_key <- add_values_to_key("Arthropod", c(Fish = 2, Mammal = 3, Bird = 5))

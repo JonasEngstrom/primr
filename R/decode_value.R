@@ -15,8 +15,6 @@
 #' @seealso [primr::make_encoding_key()]
 #' @md
 #'
-#' @import assertthat
-#'
 #' @examples
 #' # Return a vector containing "Mammal" and "Bird".
 #' decoded_values <- decode_value(15, c(Fish = 2, Mammal = 3, Bird = 5))
@@ -28,16 +26,18 @@ decode_value <- function(values_to_decode, prime_key) {
   }
 
   # Check whether values_to_decode is numeric.
-  assertthat::assert_that(is.numeric(values_to_decode),
-                        msg = "Argument value_to_decode needs to be a numeric.")
+  if (!is.numeric(values_to_decode)) {
+    stop("Argument value_to_decode needs to be a numeric.")
+  }
 
   # Check whether values_to_decode contains value that cannot be factorized using prime key.
   check_values <- values_to_decode
   for (i in prime_key[values_to_decode %% prime_key == 0]) {
     check_values <- check_values / i
   }
-  assertthat::assert_that(check_values == 1,
-                          msg = "Argument value_to_encode cannot be factorized using values in argument prime_key. Please ensure that correct key is used.")
+  if (check_values != 1) {
+    stop("Argument value_to_encode cannot be factorized using values in argument prime_key. Please ensure that correct key is used.")
+  }
 
   # Factorize values_to_decode using prime key.
   decoded_values <- names(prime_key)[values_to_decode %% prime_key == 0]
