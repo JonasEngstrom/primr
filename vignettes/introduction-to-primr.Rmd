@@ -1,0 +1,212 @@
+---
+title: "Introduction to PrimR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to PrimR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, message = FALSE, echo = FALSE}
+library(primr)
+
+library(dplyr)
+library(magrittr)
+library(tibble)
+library(tidyr)
+```
+
+## What is PrimR?
+
+PrimR provides a way of storing several categorical values in the same variable in cases where other methods like one-hot encoding, nested lists, or tidy data are impossible due to database design or are impractical.
+
+A real world example is a single spread sheet in which species of bacteria cultured from a large number of patients were stored with one row per patient and one column per locale—i.e. one column with an arbitrary number of species found in blood, another column for nasopharyngeal cultures et cetera.
+
+PrimR assigns every category in the dataset a unique prime number and then stores products of the prime numbers to represent combinations of the categories as single numbers. To get the original data back, the numbers are factorized and checked against the encoding key.
+
+For tips on how to get started using PrimR, read the following section. It goes through all of the functions in the package in the form of a short story.
+
+## PrimR Usage Example—A Story about a Survey
+
+Henry spent the morning randomly sampling a number of people in his apartment building and asking them what programming languages they knew. Henry was a math teacher. Today was Henry’s day off.
+
+### Making a Tibble for Demonstration Purposes
+
+Henry had decided to store the data he gathered in a table with two columns; one with names and one with programming languages. Every survey participant got one row. Perhaps Henry’s data savvy neighbors would have done things differently, but this was not their survey.
+
+*To illustrate this, we create a tibble of nested lists.*
+
+```{r}
+programming_skills <- tibble::tibble(
+  programmer = c('Jessica',
+                 'Anna',
+                 'Pete'),
+  languages_known = list(
+    c('Assembler', 'Fortran', 'C++'),
+    c('C++', 'JavaScript', 'Python'),
+    c('Python', 'R', 'Rust')
+    )
+  )
+```
+
+```{r}
+print(programming_skills)
+```
+
+*Using tidyr to unnest the list, we can easily see who knows what language. Henry, however, only wanted one row per person and one value per column.*
+
+```{r}
+programming_skills %>%
+  tidyr::unnest(languages_known) %>%
+  print()
+```
+
+### Making an Encoding Key
+
+*Since Henry’s neighbors—unfortunately, for our purposes—all knew more than one programming language, we need to find a way to store several languages as a single value. To accomplish this we start by assigning each programming language a prime number using `make_encoding_key()`.*
+
+```{r}
+encoding_key <- programming_skills %>%
+  tidyr::unnest(languages_known) %>%
+  dplyr::pull(languages_known) %>%
+  primr::make_encoding_key()
+```
+
+```{r}
+print(encoding_key)
+```
+
+### Encoding the Values
+
+*To store a respondent’s responses as a single value, we multiply the prime numbers corresponding to all the programming languages they know and store the product.*
+
+*Voilà, one row per person, one value per variable!*
+
+```{r}
+programming_skills <- programming_skills %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    languages_known = primr::encode_value(languages_known, encoding_key)
+    ) %>%
+  dplyr::ungroup()
+```
+
+```{r}
+print(programming_skills)
+```
+
+### Adding a Value to the Key
+
+Henry had his dataset. So far, so good. This was when Jessica called.
+
+Jessica, a recently retired university professor, was someone who was deeply troubled by the thought of incomplete data. She had just realized that she had made an unintentional omission earlier. Luckily, she was quickly able to find Henry’s phone number on the last page of the consent form Henry had made her sign. So she gave him a call.
+
+Having programmed almost exclusively in C++ for the past two decades, she forgot to mention that she did at one point use Smalltalk in her work. She asked Henry to add this to the list, as not to draw erroneous conclusions from his study.
+
+Henry agreed to Jessica’s request.
+
+*No one else among Henry’s neighbors knew Smalltalk. This means that we have to add a prime number to the encoding key we made earlier. We do this with `add_values_to_key()`.*
+
+```{r}
+encoding_key <- primr::add_values_to_key('Smalltalk', encoding_key)
+```
+
+```{r}
+print(encoding_key)
+```
+
+### Appending a Value to the Dataset
+
+*Once the new prime number is in the key, it is multiplied with the old encoded value to get the new value. This is done with `append_values()`.*
+
+```{r}
+programming_skills <- programming_skills %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    languages_known = ifelse(
+      programmer == 'Jessica',
+      primr::append_values(languages_known, 'Smalltalk', encoding_key),
+      languages_known
+      )
+    ) %>%
+  dplyr::ungroup()
+```
+
+*The amended dataset now looks like this.*
+
+```{r}
+print(programming_skills)
+```
+
+### Removing a Value from the Dataset
+
+All was well. That was, until young Pete came knocking on Henry’s door. Pete said he had something to confess.
+
+Pete, who was still a student, had taught himself programming (although he preferred to call it coding). Proficient in both Python and R, Pete had wanted to learn a compiled language for a long time. He felt this was something real programmers should know, an idea that had grown out of countless hours spent reading other people’s opinions about programming online. So he had taken to studying Rust, but had never really gotten beyond the basics. So, familiar, perhaps, but to say he knew Rust was a stretch.
+
+Rather than living with the miserable conscience of someone who has ever stated a slight inaccuracy when responding to a survey, Pete had decided to come clean. He was here to ask Henry to strike Rust from the list of languages Pete knew. Henry said he would do so.
+
+As he was leaving, Pete turned to Henry and promised to return if he decided to pursue Rust further, so Henry could once again update his dataset. Henry told Pete not to worry about it, as if he learnt any new languages, they would be caught on the six and twelve month follow up surveys, that would be mailed out once the time came.
+
+*We now need to reverse the process of appending a value. To do this we use `remove_values()`, which divides the encoded value by the value we want to remove and returns the quotient.*
+
+```{r}
+programming_skills <- programming_skills %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    languages_known = ifelse(
+      programmer == 'Pete',
+      primr::remove_values(languages_known, 'Rust', encoding_key),
+      languages_known
+      )
+    ) %>%
+  dplyr::ungroup()
+```
+
+
+```{r}
+print(programming_skills)
+```
+
+### Decoding Values
+
+*To decode the values, we divide them by all the prime numbers in the key, to see by which prime numbers the encoded values are evenly divisible. Knowing that each prime factor occurs only once in each encoded value, we can then check the factors against our key to get the original values back. This is done with `decode_value()`.*
+
+```{r}
+programming_skills <- programming_skills %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    languages_known = list(
+      primr::decode_value(languages_known, encoding_key)
+      )
+    )
+```
+
+```{r}
+print(programming_skills)
+```
+
+```{r}
+programming_skills %>%
+  tidyr::unnest(languages_known) %>%
+  print()
+```
+
+## Bonus: Prime Number Generator
+
+To generate encoding keys PrimR uses `generate_primes()` to generate prime numbers. You can too! Just pass in how many prime numbers you would like and it returns a vector of prime numbers starting at 2.
+
+```{r}
+primr::generate_primes(5)
+```
+
+## A Final Word of Caution
+
+When handling a large number of categories assigned to a single case—or when the total number of categories in the dataset is extremely large—there is a potential risk of integer overflow problems using prime number products for encoding. It has not been a problem in the design phase of PrimR, but keep it in mind when opting to use the method.
