@@ -1,15 +1,14 @@
 #include "generate_primes.h"
 #include <Rcpp.h>
 #include <vector>
-using namespace Rcpp;
 
 //' Generate Primes
 //'
 //' Generates a list of prime numbers, starting at 2. The prime numbers are used
 //' by `make_encoding_key()` to generate prime number keys for encoding.
 //'
-//' @param number_of_primes A positive integer. The number of rime numbers
-//'   desired.
+//' @param number_of_primes A positive integer. The number of prime numbers
+//'   desired. Non-integers will be rounded to the nearest smaller prime.
 //'
 //' @usage generate_primes(number_of_primes)
 //'
@@ -24,6 +23,13 @@ using namespace Rcpp;
 //' vector_of_primes <- generate_primes(3)
 // [[Rcpp::export]]
 std::vector<int> generate_primes(const int number_of_primes) {
+  if (number_of_primes == 1) {
+    std::vector<int> single_prime { 2 };
+    return single_prime;
+  } else if (number_of_primes < 1) {
+    Rcpp::stop("Argument number_of_primes must be a positive number.");
+  }
+
   std::vector<int> vector_of_primes(number_of_primes - 1);
   vector_of_primes[0] = 3;
   int primes_found = 0;

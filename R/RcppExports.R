@@ -6,8 +6,8 @@
 #' Generates a list of prime numbers, starting at 2. The prime numbers are used
 #' by `make_encoding_key()` to generate prime number keys for encoding.
 #'
-#' @param number_of_primes A positive integer. The number of rime numbers
-#'   desired.
+#' @param number_of_primes A positive integer. The number of prime numbers
+#'   desired. Non-integers will be rounded to the nearest smaller prime.
 #'
 #' @usage generate_primes(number_of_primes)
 #'
