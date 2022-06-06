@@ -6,19 +6,19 @@ PrimR assigns every category in the dataset a unique prime number and then store
 
 ## Installing the `primr` Package Using the R Terminal
 
-2. Install *devtools*
+1. Install *devtools*
 ```r
 install.packages('devtools')
 ```
-3. Load *devtools*
+2. Load *devtools*
 ```r
 library(devtools)
 ```
-4. Install `primr`
+3. Install `primr`
 ```r
 install_github('JonasEngstrom/primr', build_vignettes = TRUE)
 ```
-5. Load `primr`
+4. Load `primr`
 ```r
 library(primr)
 ```
